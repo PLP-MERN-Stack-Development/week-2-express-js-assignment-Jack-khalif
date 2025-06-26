@@ -1,71 +1,82 @@
-// server.js - Starter Express server for Week 2 assignment
+const express = require("express");
+const morgan = require("morgan");
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+const swaggerDocument = YAML.load('./swagger.yaml');
 
-// Import required modules
-const express = require('express');
-const bodyParser = require('body-parser');
-const { v4: uuidv4 } = require('uuid');
 
-// Initialize Express app
 const app = express();
-const PORT = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
 
-// Middleware setup
-app.use(bodyParser.json());
+app.use(express.json()); // Middleware to parse JSON
+//middleware to protect routes
+const auth = require("./middleware/auth");
+app.use("/api/products", auth);
 
-// Sample in-memory products database
-let products = [
-  {
-    id: '1',
-    name: 'Laptop',
-    description: 'High-performance laptop with 16GB RAM',
-    price: 1200,
-    category: 'electronics',
-    inStock: true
-  },
-  {
-    id: '2',
-    name: 'Smartphone',
-    description: 'Latest model with 128GB storage',
-    price: 800,
-    category: 'electronics',
-    inStock: true
-  },
-  {
-    id: '3',
-    name: 'Coffee Maker',
-    description: 'Programmable coffee maker with timer',
-    price: 50,
-    category: 'kitchen',
-    inStock: false
-  }
-];
+app.use(morgan("tiny")); // Logger
 
-// Root route
-app.get('/', (req, res) => {
-  res.send('Welcome to the Product API! Go to /api/products to see all products.');
+// In-memory database
+let products = [];
+let idCounter = 1;
+
+// Routes
+app.get("/", (req, res) => {
+  res.send("Hello World from Express API!");
 });
 
-// TODO: Implement the following routes:
-// GET /api/products - Get all products
-// GET /api/products/:id - Get a specific product
-// POST /api/products - Create a new product
-// PUT /api/products/:id - Update a product
-// DELETE /api/products/:id - Delete a product
+app.get("/api/products", (req, res) => {
+  const { category, page = 1, limit = 5, search } = req.query;
+  let result = [...products];
 
-// Example route implementation for GET /api/products
-app.get('/api/products', (req, res) => {
-  res.json(products);
+  if (category) result = result.filter(p => p.category === category);
+  if (search) result = result.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
+
+  const start = (page - 1) * limit;
+  const end = start + parseInt(limit);
+  res.json(result.slice(start, end));
+});
+app.get("/api/products-stats", (req, res) => {
+  const stats = {};
+  products.forEach(p => {
+    stats[p.category] = (stats[p.category] || 0) + 1;
+  });
+  res.json(stats);
 });
 
-// TODO: Implement custom middleware for:
-// - Request logging
-// - Authentication
-// - Error handling
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+app.get("/api/products/:id", (req, res) => {
+  const product = products.find(p => p.id === parseInt(req.params.id));
+  if (!product) return res.status(404).json({ error: "Product not found" });
+  res.json(product);
 });
 
-// Export the app for testing purposes
-module.exports = app; 
+app.post("/api/products", (req, res) => {
+  const { name, description, price, category, inStock } = req.body;
+  const newProduct = { id: idCounter++, name, description, price, category, inStock };
+  products.push(newProduct);
+  res.status(201).json(newProduct);
+});
+
+app.put("/api/products/:id", (req, res) => {
+  const product = products.find(p => p.id === parseInt(req.params.id));
+  if (!product) return res.status(404).json({ error: "Product not found" });
+
+  const { name, description, price, category, inStock } = req.body;
+  Object.assign(product, { name, description, price, category, inStock });
+  res.json(product);
+});
+
+app.delete("/api/products/:id", (req, res) => {
+  products = products.filter(p => p.id !== parseInt(req.params.id));
+  res.status(204).send();
+});
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
+});
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: "There is a Problem Jack!" });
+});

@@ -47,17 +47,167 @@ The API will have the following endpoints:
 - `PUT /api/products/:id`: Update a product
 - `DELETE /api/products/:id`: Delete a product
 
-## Submission
+# PLP WEEK 2 EXPRESS JS ASSIGNMENT API
 
-Your work will be automatically submitted when you push to your GitHub Classroom repository. Make sure to:
+This is a simple Express.js API for managing products.  
+Swagger documentation is available at [`/api-docs`](http://localhost:3000/api-docs).
 
-1. Complete all the required API endpoints
-2. Implement the middleware and error handling
-3. Document your API in the README.md
-4. Include examples of requests and responses
+---
 
-## Resources
+## Endpoints
 
-- [Express.js Documentation](https://expressjs.com/)
-- [RESTful API Design Best Practices](https://restfulapi.net/)
-- [HTTP Status Codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status) 
+### Get All Products
+
+**GET** `/api/products`
+
+**Query Parameters:**
+- `category` (optional): Filter by category
+- `page` (optional): Page number (default: 1)
+- `limit` (optional): Items per page (default: 5)
+- `search` (optional): Search by product name
+
+**Example Request:**
+```http
+GET /api/products?category=Electronics&page=1&limit=2
+```
+
+**Example Response:**
+```json
+[
+  {
+    "id": 1,
+    "name": "Phone",
+    "description": "Smartphone",
+    "price": 299,
+    "category": "Electronics",
+    "inStock": true
+  }
+]
+```
+
+---
+
+### Get Product By ID
+
+**GET** `/api/products/{id}`
+
+**Example Request:**
+```http
+GET /api/products/1
+```
+
+**Example Response:**
+```json
+{
+  "id": 1,
+  "name": "Phone",
+  "description": "Smartphone",
+  "price": 299,
+  "category": "Electronics",
+  "inStock": true
+}
+```
+
+---
+
+### Create Product
+
+**POST** `/api/products`
+
+**Request Body:**
+```json
+{
+  "name": "Laptop",
+  "description": "Gaming laptop",
+  "price": 1200,
+  "category": "Electronics",
+  "inStock": true
+}
+```
+
+**Example Response:**
+```json
+{
+  "id": 2,
+  "name": "Laptop",
+  "description": "Gaming laptop",
+  "price": 1200,
+  "category": "Electronics",
+  "inStock": true
+}
+```
+
+---
+
+### Update Product
+
+**PUT** `/api/products/{id}`
+
+**Request Body:**
+```json
+{
+  "name": "Laptop Pro",
+  "description": "High-end gaming laptop",
+  "price": 1500,
+  "category": "Electronics",
+  "inStock": false
+}
+```
+
+**Example Response:**
+```json
+{
+  "id": 2,
+  "name": "Laptop Pro",
+  "description": "High-end gaming laptop",
+  "price": 1500,
+  "category": "Electronics",
+  "inStock": false
+}
+```
+
+---
+
+### Delete Product
+
+**DELETE** `/api/products/{id}`
+
+**Example Request:**
+```http
+DELETE /api/products/2
+```
+
+**Example Response:**
+- Status: `204 No Content`
+
+---
+
+### Product Stats
+
+**GET** `/api/products-stats`
+
+**Example Response:**
+```json
+{
+  "Electronics": 2,
+  "Books": 1
+}
+```
+
+---
+
+## Error Example
+
+**Product Not Found:**
+```json
+{
+  "error": "Product not found"
+}
+```
+### Example POST request in Postman
+
+![Postman POST Example](images/POST.png)
+
+### Swagger UI
+
+![Swagger UI Screenshot](images/swaggerapiPLP.png)

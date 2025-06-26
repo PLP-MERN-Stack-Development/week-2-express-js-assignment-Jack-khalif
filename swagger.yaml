@@ -1,0 +1,40 @@
+swagger: "2.0"
+info:
+  title: PLP WEEK 2 EXPRESS JS ASSIGNMENT
+  description: Swagger documentation for the PLP Week 2 Express JS Assignment
+  version: 1.0.0
+host: localhost:3000
+schemes:
+  - http
+paths:
+  /api/products:
+    get:
+      summary: Get all products
+      responses:
+        200:
+          description: A list of products
+    post:
+      summary: Create a new product
+      responses:
+        201:
+          description: The created product
+  /api/products/{id}:
+    get:
+      summary: Get a product by ID
+      responses:
+        200:
+          description: The requested product
+        404:
+          description: Product not found
+    put:
+      summary: Update a product by ID
+      responses:
+        200:
+          description: The updated product
+        404:
+          description: Product not found
+    delete:
+      summary: Delete a product by ID
+      responses:
+        204:
+          description: Product deleted

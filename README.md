@@ -206,8 +206,8 @@ DELETE /api/products/2
 ```
 ### Example POST request in Postman
 
-![Postman POST Example](images/POST.png)
+![Postman POST Example](image/POST.png)
 
 ### Swagger UI
 
-![Swagger UI Screenshot](images/swaggerapiPLP.png)
+![Swagger UI Screenshot](image/swaggerapiPLP.png)
